@@ -210,7 +210,15 @@ trainX2 = trainX2.reshape(-1, 32, 32, 3)
 testX1 = testX1.reshape(-1, 32, 32, 3) 
 testX2 = testX2.reshape(-1, 32, 32, 3) 
 
-   
+net = shared_net(nkerns)
+trainop = tf.train.GradientDescentOptimizer(learning_rate).minimize(net.cost)
+predict_op = tf.argmax(logits, 1)
+
+with tf.Session() as sess:
+
+    tf.initialize_all_variables().run()
+
+
     # create a function to compute the mistakes that are made by the model
 test_model = theano.function(
         [index],
@@ -222,20 +230,6 @@ test_model = theano.function(
         }
     )
 
-#validate_model = theano.function(
-#        [index],
-#        layer3.errors(y),
-#        givens={
-#            x: valid_set_x[index * batch_size: (index + 1) * batch_size],
-#            y: valid_set_y[index * batch_size: (index + 1) * batch_size]
-#        }
-#    )
-
-    # create a list of all model parameters to be fit by gradient descent
-params = layer3.params + layer2.params + layer1.params + layer0.params
-
-    # create a list of gradients for all model parameters
-grads = T.grad(cost, params)
 
     # train_model is a function that updates the model parameters by
     # SGD Since this model has many parameters, it would be tedious to
